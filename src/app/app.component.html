@@ -1,0 +1,53 @@
+<header>
+	<h1>Center for Imaging Research (CIR)</h1>
+	<h2 style="position: absolute; left: 40px;">Brain Imaging Data Structure (BIDS) </h2>
+</header>
+
+<div class="margin">
+	<h2>Modality agnostic files</h2>
+	<h3>Input data to generate dataset_description.json</h3>
+</div>
+
+<form *ngIf="filterForm" [formGroup]="filterForm" class="filter-form margin">
+	<ng-container *ngTemplateOutlet="recursiveList; context:{ $implicit: filterFields,formGroup:filterForm }">
+	</ng-container>
+</form>
+
+<ng-template #recursiveList let-filterFields let-formGroup="formGroup">
+	<table class="form-group">
+		<tr>
+			<th><strong>Key name</strong></th>
+			<th><strong>Requirement Level</strong></th>
+			<th><strong>Data type</strong></th>
+			<th><strong>Description</strong></th>
+			<th><strong>Input</strong></th>
+		</tr>
+		<ng-container *ngFor="let item of filterFields">
+			<tr>
+				<td>{{item.column1}}</td>
+				<td>{{item.column2}}</td>
+				<td>{{item.column3}}</td>
+				<td><p>{{item.title}}</p></td>
+				<td><ng-container *ngIf="item.group; else default;">
+					 <div class="row pb-4">
+						 <div [formGroup]="formGroup.get(item.key)">
+							 <ng-container
+								 *ngTemplateOutlet="recursiveList; context:{ $implicit: item.group, formGroup: formGroup.get( item.key)}">
+							 </ng-container>
+						 </div>
+					 </div>
+						</ng-container>
+							<ng-template #default>
+								<div class="col-md-3">
+									<input [type]="item.type" [formControl]="formGroup.get(item.key)"
+									[placeholder]="item.title" [name]="item.key" />
+								</div>
+							</ng-template>
+				</td>
+			</tr>
+			</ng-container>
+	</table>
+	<h3>Here is your dataset_description.json:</h3>
+	<pre>{{filterForm?.value|json}}</pre>
+	<button (click)="download()">Download</button>
+</ng-template>
